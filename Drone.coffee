@@ -4,6 +4,7 @@ class Drone
   constructor: (@eventemitter, @client) ->
     @client.up = _.throttle(@client.up, 10)
     @client.down = _.throttle(@client.down, 10)
+    @client.on 'navdata', console.log
 
   start: ->
     @registerTakeoffAndLanding()
@@ -13,8 +14,10 @@ class Drone
     @eventemitter.on 'takeoff', =>
       @client.takeoff =>
         @client.up 1
-        setTimeout -> 
-        @eventemitter.emit 'inflight'
+        setTimeout =>
+          @client.stop()
+          @eventemitter.emit 'inflight'
+        , 2
     @eventemitter.on 'land', =>
       @client.land => @eventemitter.emit 'ready'
 
@@ -25,6 +28,7 @@ class Drone
     @eventemitter.on 'right', (speed) => @client.right speed
     @eventemitter.on 'forward', (speed) => @client.front speed
     @eventemitter.on 'backward', (speed) => @client.back speed
+    @eventemitter.on 'stop', => @client.stop()
 
   sanatizeSpeed: (speed) ->
     Math.min(speed/400, 1)

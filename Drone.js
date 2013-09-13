@@ -10,6 +10,7 @@
       this.client = client;
       this.client.up = _.throttle(this.client.up, 10);
       this.client.down = _.throttle(this.client.down, 10);
+      this.client.on('navdata', console.log);
     }
 
     Drone.prototype.start = function() {
@@ -22,8 +23,10 @@
       this.eventemitter.on('takeoff', function() {
         return _this.client.takeoff(function() {
           _this.client.up(1);
-          setTimeout(function() {});
-          return _this.eventemitter.emit('inflight');
+          return setTimeout(function() {
+            _this.client.stop();
+            return _this.eventemitter.emit('inflight');
+          }, 2);
         });
       });
       return this.eventemitter.on('land', function() {
@@ -50,8 +53,11 @@
       this.eventemitter.on('forward', function(speed) {
         return _this.client.front(speed);
       });
-      return this.eventemitter.on('backward', function(speed) {
+      this.eventemitter.on('backward', function(speed) {
         return _this.client.back(speed);
+      });
+      return this.eventemitter.on('stop', function() {
+        return _this.client.stop();
       });
     };
 
