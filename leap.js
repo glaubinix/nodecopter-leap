@@ -18,7 +18,7 @@ controller.on("frame", function(frame) {
 	if (frame.id % 2 == 0) return;
 
 	if (drone_state === 'landed' && frame.hands.length == 2) {
-		eventemitter.emit('takeoff');
+		//eventemitter.emit('takeoff');
 		console.log("hand in -> takeoff");
 	}
 

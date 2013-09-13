@@ -22,7 +22,8 @@
       this.altitudeMove = __bind(this.altitudeMove, this);
       this.updateState = __bind(this.updateState, this);
       this.client.on('navdata', function(data) {
-        if (data.demo.batteryPercentage < 20) {
+        var _ref;
+        if (((_ref = data.demo) != null ? _ref.batteryPercentage : void 0) < 20) {
           console.warn("WARNING: BATTERY " + data.demo.batteryPercentage + " CHARGED!");
         }
         if (state !== 'inflight') {
@@ -83,7 +84,7 @@
       return this.eventemitter.on('flip', function() {
         _this.updateState('trick');
         setTimeout(function() {
-          return this.updateState('inflight');
+          return _this.updateState('inflight');
         }, time);
         return _this.client.animate('flipAhead', time);
       });
@@ -97,13 +98,13 @@
     Drone.prototype.altitudeMove = function(drone_perc_alt, hand_perc_alt) {
       console.log("Drone alt: " + drone_perc_alt + "%");
       console.log("Hand alt: " + hand_perc_alt + "%");
-      if (between(drone_perc_alt, hand_perc_alt(-5, hand_perc_alt + 5))) {
+      if (between(drone_perc_alt, hand_perc_alt - 5, hand_perc_alt + 5)) {
         return;
       }
-      if (drone_perc_alt > hand_perc_alt) {
+      if (drone_perc_alt < hand_perc_alt) {
         this.client.up(0.5);
       }
-      if (drone_perc_alt < hand_perc_alt) {
+      if (drone_perc_alt > hand_perc_alt) {
         return this.client.down(0.5);
       }
     };

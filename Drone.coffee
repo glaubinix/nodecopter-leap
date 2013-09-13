@@ -12,7 +12,7 @@ class Drone
 
   constructor: (@eventemitter, @client) ->
     @client.on 'navdata', (data) ->
-      if data.demo.batteryPercentage < 20
+      if data.demo?.batteryPercentage < 20
         console.warn "WARNING: BATTERY #{data.demo.batteryPercentage} CHARGED!"
       return unless state is 'inflight'
       drone_alt = data.demo.altitude * 1000
@@ -48,7 +48,7 @@ class Drone
     time = 1500
     @eventemitter.on 'flip', =>
       @updateState 'trick'
-      setTimeout ->
+      setTimeout =>
         @updateState 'inflight'
       , time
       @client.animate 'flipAhead', time
@@ -60,11 +60,11 @@ class Drone
   altitudeMove: (drone_perc_alt, hand_perc_alt) =>
     console.log "Drone alt: #{drone_perc_alt}%"
     console.log "Hand alt: #{hand_perc_alt}%"
-    if between(drone_perc_alt, hand_perc_alt -5, hand_perc_alt + 5)
+    if between(drone_perc_alt, hand_perc_alt-5, hand_perc_alt+5)
       return
-    if drone_perc_alt > hand_perc_alt
-      @client.up 0.5
     if drone_perc_alt < hand_perc_alt
+      @client.up 0.5
+    if drone_perc_alt > hand_perc_alt
       @client.down 0.5
 
 module.exports = Drone
