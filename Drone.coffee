@@ -18,6 +18,8 @@ class Drone
   registerMoves: ->
     @eventemitter.on 'up', (speed) => @client.up @sanatizeSpeed speed
     @eventemitter.on 'down', (speed) => @client.down @sanatizeSpeed speed
+    @eventemitter.on 'left', (speed) => @client.left speed
+    @eventemitter.on 'right', (speed) => @client.right speed
 
   sanatizeSpeed: (speed) ->
     speed = Math.min(speed/400, 1)

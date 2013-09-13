@@ -36,8 +36,14 @@
       this.eventemitter.on('up', function(speed) {
         return _this.client.up(_this.sanatizeSpeed(speed));
       });
-      return this.eventemitter.on('down', function(speed) {
+      this.eventemitter.on('down', function(speed) {
         return _this.client.down(_this.sanatizeSpeed(speed));
+      });
+      this.eventemitter.on('left', function(speed) {
+        return _this.client.left(speed);
+      });
+      return this.eventemitter.on('right', function(speed) {
+        return _this.client.right(speed);
       });
     };
 

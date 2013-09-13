@@ -17,7 +17,12 @@ var leap = new leapcontrol(ee);
 var drone = new Drone(ee, client);
 drone.start();
 
-process.on('exit', function() {
+process.on('SIGINT', function() {
     console.log('bye bye');
-    drone.land();
+    drone.land(function(){
+        process.exit();
+    });
+    setTimeout(function(){
+        process.exit();
+    }, 2)
 });
