@@ -2,8 +2,8 @@ class Drone
   constructor: (@eventemitter, @client) ->
 
   start: ->
-    registerTakeoffAndLanding()
-    registerMoves()
+    @registerTakeoffAndLanding()
+    @registerMoves()
 
   registerTakeoffAndLanding: ->
     @eventemitter.on 'takeoff', =>
@@ -13,6 +13,6 @@ class Drone
 
   registerMoves: ->
     @eventemitter.on 'up', (speed) => @client.up speed
-    @eventemitter.down 'up', (speed) => @client.down speed
+    @eventemitter.on 'down', (speed) => @client.down speed
 
 module.exports = Drone
