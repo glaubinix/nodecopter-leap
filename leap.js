@@ -2,22 +2,18 @@ var Leap = require('leapjs');
 
 var controller = new Leap.Controller({ inNode: true });
 
-var eventemitter;
+var client;
 var inflight = false;
 var drone_ready = true;
 
-var leap = function(emitter) {
-	eventemitter = emitter;
-
-	eventemitter.on('inflight', function() {
-		inflight = true;
-	});
+var leap = function(ardrone) {
+	client = ardrone;
 };
 
 var frameCounter = 0;
-controller.on("frame", function(frame) {
+controller.loop(function(frame) {
 	if (!inflight) {
-		return;
+		//return;
 	}
 
 	frameCounter++;
@@ -27,59 +23,57 @@ controller.on("frame", function(frame) {
 
 	var event = false;
 	if (frame.hands.length == 1) {
+
 		var right_left_speed = frame.hands[0].palmNormal[0];
-		if (right_left_speed > 0.2) {
-			eventemitter.emit('left', right_left_speed);
+		if (right_left_speed > 0.15) {
+			console.log('left', Math.abs(right_left_speed))
 			event = true;
-		} else if (right_left_speed < -0.2) {
-			eventemitter.emit('right', -1 * right_left_speed);
+			client.left(Math.abs(right_left_speed));
+		} else if (right_left_speed < -0.15) {
+			console.log('right', Math.abs(right_left_speed));
+			client.right('right', Math.abs(right_left_speed));
 			event = true;
 		}
 
 		var forward_backward_speed = frame.hands[0].palmNormal[2];
-		if (forward_backward_speed > 0.2) {
-			eventemitter.emit('forward', forward_backward_speed);
+		if (forward_backward_speed > 0.15) {
+			client.front(Math.abs(forward_backward_speed));
+			console.log('front', Math.abs(forward_backward_speed))
 			event = true;
-		} else if (forward_backward_speed < -0.2) {
-			eventemitter.emit('backward', -1 * forward_backward_speed);
+		} else if (forward_backward_speed < -0.15) {
+			console.log('back', Math.abs(forward_backward_speed));
+			client.back('back', Math.abs(forward_backward_speed));
 			event = true;
 		}
 
 		if (!event) {
-			//eventemitter.emit('stop', 'stop');
+			//client.stop();
 		}
 	} else if (frame.hands.length == 2) {
 		inflight = false;
-		eventemitter.emit('land', "landing");
+		client.land();
+		console.log('land')
 	}
-});
-
-controller.on('ready', function() {
-	console.log("ready");
-});
-controller.on('connect', function() {
-	console.log("connect");
 });
 
 controller.on('disconnect', function() {
 	console.log("disconnect -> land");
-	eventemitter.emit('land');
+	client.land();
 	inflight = false;
 });
 controller.on('focus', function() {
 	if (drone_ready) {
 		console.log("focus -> takeoff");
-		eventemitter.emit('takeoff');
+		client.takeoff(function() {
+			inflight = true;
+		})
 	}
 });
-controller.on('deviceConnected', function() {
-	console.log("deviceConnected");
-	eventemitter.emit('takeoff');
-});
+
 controller.on('deviceDisconnected', function() {
 	console.log("deviceDisconnected -> land");
 	inflight = false;
-	eventemitter.emit('land');
+	client.land();
 });
 
 controller.connect();
