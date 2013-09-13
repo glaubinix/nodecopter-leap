@@ -58,8 +58,9 @@ class Drone
     @eventemitter.emit 'state', state
 
   altitudeMove: (drone_perc_alt, hand_perc_alt) =>
+    console.log "Drone alt: #{drone_perc_alt}%"
+    console.log "Hand alt: #{hand_perc_alt}%"
     if between(drone_perc_alt, hand_perc_alt -5, hand_perc_alt + 5)
-      client.stop();
       return
     if drone_perc_alt > hand_perc_alt
       @client.up 0.5
