@@ -77,9 +77,15 @@
     };
 
     Drone.prototype.registerTricks = function() {
-      var _this = this;
+      var time,
+        _this = this;
+      time = 1500;
       return this.eventemitter.on('flip', function() {
-        return _this.client.animate('flipAhead', 1500);
+        _this.updateState('trick');
+        setTimeout(function() {
+          return this.updateState('inflight');
+        }, time);
+        return _this.client.animate('flipAhead', time);
       });
     };
 

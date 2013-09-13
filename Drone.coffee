@@ -45,7 +45,13 @@ class Drone
       @altitudeMove(drone_perc, hand_perc)
 
   registerTricks: ->
-    @eventemitter.on 'flip', => @client.animate 'flipAhead', 1500
+    time = 1500
+    @eventemitter.on 'flip', =>
+      @updateState 'trick'
+      setTimeout ->
+        @updateState 'inflight'
+      , time
+      @client.animate 'flipAhead', time
 
   updateState: (new_state) =>
     state = new_state
