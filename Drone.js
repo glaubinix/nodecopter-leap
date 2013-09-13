@@ -10,7 +10,10 @@
       this.client = client;
       this.client.up = _.throttle(this.client.up, 10);
       this.client.down = _.throttle(this.client.down, 10);
-      this.client.on('navdata', console.log);
+      this.client.on('navdata', function(data) {
+        console.log('alt', data.droneState.demo.altitude);
+        return console.log('altmeter', data.droneState.demo.altitudeMeters);
+      });
     }
 
     Drone.prototype.start = function() {
@@ -26,7 +29,7 @@
           return setTimeout(function() {
             _this.client.stop();
             return _this.eventemitter.emit('inflight');
-          }, 2);
+          }, 2000);
         });
       });
       return this.eventemitter.on('land', function() {
@@ -38,12 +41,6 @@
 
     Drone.prototype.registerMoves = function() {
       var _this = this;
-      this.eventemitter.on('up', function(speed) {
-        return _this.client.up(_this.sanatizeSpeed(speed));
-      });
-      this.eventemitter.on('down', function(speed) {
-        return _this.client.down(_this.sanatizeSpeed(speed));
-      });
       this.eventemitter.on('left', function(speed) {
         return _this.client.left(speed);
       });
@@ -56,9 +53,7 @@
       this.eventemitter.on('backward', function(speed) {
         return _this.client.back(speed);
       });
-      return this.eventemitter.on('stop', function() {
-        return _this.client.stop();
-      });
+      return this.eventemitter.on('altitude', function(alt) {});
     };
 
     Drone.prototype.sanatizeSpeed = function(speed) {
