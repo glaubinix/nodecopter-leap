@@ -1,5 +1,9 @@
+_ = require('underscore')
+
 class Drone
   constructor: (@eventemitter, @client) ->
+    @client.up = _.throttle(@client.up, 100)
+    @client.down = _.throttle(@client.down, 100)
 
   start: ->
     @registerTakeoffAndLanding()
@@ -16,6 +20,11 @@ class Drone
     @eventemitter.on 'down', (speed) => @client.down @sanatizeSpeed speed
 
   sanatizeSpeed: (speed) ->
-    Math.min(speed/1000, 1)
+    speed = Math.min(speed/400, 1)
+    console.log speed
+    speed
+
+  land: () ->
+    @client.land => @eventemitter.emit 'ready'
 
 module.exports = Drone
