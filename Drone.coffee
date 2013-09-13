@@ -12,7 +12,10 @@ class Drone
       @client.land => @eventemitter.emit 'ready'
 
   registerMoves: ->
-    @eventemitter.on 'up', (speed) => @client.up speed
-    @eventemitter.on 'down', (speed) => @client.down speed
+    @eventemitter.on 'up', (speed) => @client.up @sanatizeSpeed speed
+    @eventemitter.on 'down', (speed) => @client.down @sanatizeSpeed speed
+
+  sanatizeSpeed: (speed) ->
+    Math.min(speed/1000, 1)
 
 module.exports = Drone

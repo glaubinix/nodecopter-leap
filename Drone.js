@@ -9,8 +9,8 @@
     }
 
     Drone.prototype.start = function() {
-      registerTakeoffAndLanding();
-      return registerMoves();
+      this.registerTakeoffAndLanding();
+      return this.registerMoves();
     };
 
     Drone.prototype.registerTakeoffAndLanding = function() {
@@ -30,11 +30,15 @@
     Drone.prototype.registerMoves = function() {
       var _this = this;
       this.eventemitter.on('up', function(speed) {
-        return _this.client.up(speed);
+        return _this.client.up(_this.sanatizeSpeed(speed));
       });
-      return this.eventemitter.down('up', function(speed) {
-        return _this.client.down(speed);
+      return this.eventemitter.on('down', function(speed) {
+        return _this.client.down(_this.sanatizeSpeed(speed));
       });
+    };
+
+    Drone.prototype.sanatizeSpeed = function(speed) {
+      return Math.min(speed / 1000, 1);
     };
 
     return Drone;
