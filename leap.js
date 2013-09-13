@@ -20,7 +20,7 @@ controller.on("frame", function(frame) {
 	}
 
 	var event = false;
-	if (frame.hands.length > 0) {
+	if (frame.hands.length == 1) {
 		var up_down_speed = frame.hands[0].palmVelocity[1];
 		if (up_down_speed > 20) {
 			eventemitter.emit('up', up_down_speed);
@@ -51,6 +51,8 @@ controller.on("frame", function(frame) {
 		if (!event) {
 			eventemitter.emit('stop');
 		}
+	} else if (frame.hands.length == 2) {
+		eventemitter.emit('land');
 	}
 });
 
