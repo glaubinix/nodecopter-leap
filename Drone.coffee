@@ -1,12 +1,14 @@
 _ = require('underscore')
 
 class Drone
+
+  state = 'landed'
+  alt = 0
+
   constructor: (@eventemitter, @client) ->
-    @client.up = _.throttle(@client.up, 10)
-    @client.down = _.throttle(@client.down, 10)
     @client.on 'navdata', (data) ->
-      console.log 'alt',data.droneState.demo.altitude
-      console.log 'altmeter',data.droneState.demo.altitudeMeters
+      alt = data.demo.altitude
+      console.log 'alt', alt
 
   start: ->
     @registerTakeoffAndLanding()
@@ -15,27 +17,27 @@ class Drone
   registerTakeoffAndLanding: ->
     @eventemitter.on 'takeoff', =>
       @client.takeoff =>
-        @client.up 1
-        setTimeout =>
-          @client.stop()
-          @eventemitter.emit 'inflight'
-        , 2000
+        updateState 'inflight'
     @eventemitter.on 'land', =>
-      @client.land => @eventemitter.emit 'ready'
+      updateState 'landing'
+      @client.land =>
+        updateState 'landed'
 
   registerMoves: ->
-    @eventemitter.on 'left', (speed) => @client.left speed
-    @eventemitter.on 'right', (speed) => @client.right speed
-    @eventemitter.on 'forward', (speed) => @client.front speed
-    @eventemitter.on 'backward', (speed) => @client.back speed
+    @eventemitter.on 'left', (speed) => sendCommand 'left', speed
+    @eventemitter.on 'right', (speed) => sendCommand 'right', speed
+    @eventemitter.on 'forward', (speed) => sendCommand 'front', speed
+    @eventemitter.on 'backward', (speed) => sendCommand 'back', speed
 
     @eventemitter.on 'altitude', (alt) => #0 - 400
       #console.log 'send.alt', alt
 
-  sanatizeSpeed: (speed) ->
-    Math.min(speed/400, 1)
+  sendCommand: (cmd, arg) ->
+    return unless state == 'inflight'
+    @client[cmd](arg)
 
-  land: () ->
-    @client.land => @eventemitter.emit 'ready'
+  updateState: (new_state) =>
+    state = new_state
+    @eventemitter.emit state
 
 module.exports = Drone
