@@ -1,0 +1,6 @@
+{
+	"dependencies": {
+		"leapjs": "0.2.0",
+		"ar-drone": "0.2.0"
+	}
+}
