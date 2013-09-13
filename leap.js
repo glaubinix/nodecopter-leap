@@ -37,10 +37,8 @@ controller.on("frame", function(frame) {
 		var forward_backward_speed = frame.hands[0].palmNormal[2];
 		if (forward_backward_speed > 0.15) {
 			eventemitter.emit('forward', forward_backward_speed);
-			console.log('forward', forward_backward_speed);
 		} else if (forward_backward_speed < -0.15) {
 			eventemitter.emit('backward', -1 * forward_backward_speed);
-			console.log('backward', forward_backward_speed);
 		}
 
 	}
