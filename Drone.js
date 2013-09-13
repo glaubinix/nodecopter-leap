@@ -8,8 +8,8 @@
     function Drone(eventemitter, client) {
       this.eventemitter = eventemitter;
       this.client = client;
-      this.client.up = _.throttle(this.client.up, 100);
-      this.client.down = _.throttle(this.client.down, 100);
+      this.client.up = _.throttle(this.client.up, 10);
+      this.client.down = _.throttle(this.client.down, 10);
     }
 
     Drone.prototype.start = function() {
@@ -21,6 +21,8 @@
       var _this = this;
       this.eventemitter.on('takeoff', function() {
         return _this.client.takeoff(function() {
+          _this.client.up(1);
+          setTimeout(function() {});
           return _this.eventemitter.emit('inflight');
         });
       });
@@ -42,15 +44,19 @@
       this.eventemitter.on('left', function(speed) {
         return _this.client.left(speed);
       });
-      return this.eventemitter.on('right', function(speed) {
+      this.eventemitter.on('right', function(speed) {
         return _this.client.right(speed);
+      });
+      this.eventemitter.on('forward', function(speed) {
+        return _this.client.front(speed);
+      });
+      return this.eventemitter.on('backward', function(speed) {
+        return _this.client.back(speed);
       });
     };
 
     Drone.prototype.sanatizeSpeed = function(speed) {
-      speed = Math.min(speed / 400, 1);
-      console.log(speed);
-      return speed;
+      return Math.min(speed / 400, 1);
     };
 
     Drone.prototype.land = function() {
