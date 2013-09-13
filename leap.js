@@ -19,7 +19,7 @@ controller.on("frame", function(frame) {
 		console.log("hand in -> takeoff");
 	}
 
-	if (!drone_state !== 'inflight') {
+	if (drone_state !== 'inflight') {
 		return;
 	}
 

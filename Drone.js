@@ -6,19 +6,25 @@
   _ = require('underscore');
 
   Drone = (function() {
-    var alt, state;
+    var drone_alt, state;
 
     state = 'landed';
 
-    alt = 0;
+    drone_alt = 0;
 
     function Drone(eventemitter, client) {
       this.eventemitter = eventemitter;
       this.client = client;
+      this.calculate_drone_speed = __bind(this.calculate_drone_speed, this);
       this.updateState = __bind(this.updateState, this);
       this.client.on('navdata', function(data) {
-        alt = data.demo.altitude;
-        return console.log('alt', alt);
+        if (data.demo.batteryPercentage < 20) {
+          console.warn("WARNING: BATTERY " + data.demo.batteryPercentage + " CHARGED!");
+        }
+        if (state !== 'inflight') {
+          return;
+        }
+        return drone_alt = data.demo.altitude * 1000;
       });
     }
 
@@ -30,46 +36,58 @@
     Drone.prototype.registerTakeoffAndLanding = function() {
       var _this = this;
       this.eventemitter.on('takeoff', function() {
+        _this.updateState('starting');
         return _this.client.takeoff(function() {
-          return updateState('inflight');
+          return _this.updateState('inflight');
         });
       });
       return this.eventemitter.on('land', function() {
-        updateState('landing');
+        _this.updateState('landing');
         return _this.client.land(function() {
-          return updateState('landed');
+          return _this.updateState('landed');
         });
       });
     };
 
     Drone.prototype.registerMoves = function() {
+      /*
+      @eventemitter.on 'left', (speed) => @sendCommand 'left', speed
+      @eventemitter.on 'right', (speed) => @sendCommand 'right', speed
+      @eventemitter.on 'forward', (speed) => @sendCommand 'front', speed
+      @eventemitter.on 'backward', (speed) => @sendCommand 'back', speed
+      */
+
       var _this = this;
       this.eventemitter.on('left', function(speed) {
-        return sendCommand('left', speed);
+        return _this.client.left(speed);
       });
       this.eventemitter.on('right', function(speed) {
-        return sendCommand('right', speed);
+        return _this.client.right(speed);
       });
       this.eventemitter.on('forward', function(speed) {
-        return sendCommand('front', speed);
+        return _this.client.front(speed);
       });
       this.eventemitter.on('backward', function(speed) {
-        return sendCommand('back', speed);
+        return _this.client.back(speed);
       });
       return this.eventemitter.on('altitude', function(alt) {});
     };
 
     Drone.prototype.sendCommand = function(cmd, arg) {
+      console.log('this should never happen');
       if (state !== 'inflight') {
         return;
       }
+      console.log(cmd, arg);
       return this.client[cmd](arg);
     };
 
     Drone.prototype.updateState = function(new_state) {
       state = new_state;
-      return this.eventemitter.emit(state);
+      return this.eventemitter.emit('state', state);
     };
+
+    Drone.prototype.calculate_drone_speed = function(drone_perc_alt, hand_perc_alt) {};
 
     return Drone;
 
