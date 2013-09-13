@@ -16,16 +16,24 @@ var leap = function(emitter) {
 
 controller.on("frame", function(frame) {
 	if (!inflight) {
-		return;
+		//return;
 	}
 
 	if (frame.hands.length > 0) {
-		var speed = frame.hands[0].palmVelocity[1];
-		if (speed > 0) {
-			eventemitter.emit('up', speed);
-		} else if (speed < 0) {
-			eventemitter.emit('down', -1 * speed);
+		var up_down_speed = frame.hands[0].palmVelocity[1];
+		if (up_down_speed > 20) {
+			eventemitter.emit('up', up_down_speed);
+		} else if (up_down_speed < -20) {
+			eventemitter.emit('down', -1 * up_down_speed);
 		}
+
+		var right_left_speed = frame.hands[0].palmNormal[0];
+		if (right_left_speed > 0.15) {
+			eventemitter.emit('left', right_left_speed);
+		} else if (right_left_speed < -0.15) {
+			eventemitter.emit('right', -1 * right_left_speed);
+		}
+
 	}
 });
 
