@@ -4,7 +4,9 @@
 
 var EventEmitter2 = require('eventemitter2').EventEmitter2;
 var leapcontrol = require('./leap.js');
-//var drone = require('./drone.js');
+var arDrone = require('ar-drone');
+var client  = arDrone.createClient();
+var drone = require('./drone.js');
 
 var ee = new EventEmitter2({
 	wildcard: true,
@@ -12,4 +14,4 @@ var ee = new EventEmitter2({
 });
 
 var leap = new leapcontrol(ee);
-//var drone = new Drone(ee);
+var drone = new Drone(ee, client);

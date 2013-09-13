@@ -2,6 +2,7 @@
   "dependencies": {
     "leapjs": "0.2.0",
     "ar-drone": "0.2.0",
-    "eventemitter2": "~0.4.13"
+    "eventemitter2": "~0.4.13",
+    "coffee-script": "~1.6.3"
   }
 }
