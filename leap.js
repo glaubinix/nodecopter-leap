@@ -3,7 +3,7 @@ var Leap = require('leapjs');
 var controller = new Leap.Controller({ inNode: true });
 
 var eventemitter;
-var drone_state = 'landed';
+var drone_state = 'none';
 
 var leap = function(emitter) {
 	eventemitter = emitter;
@@ -14,6 +14,11 @@ var leap = function(emitter) {
 };
 
 controller.on("frame", function(frame) {
+	if (drone_state === 'landed' && frame.hands.length == 1) {
+		eventemitter.emit('takeoff');
+		console.log("hand in -> takeoff");
+	}
+
 	if (!drone_state !== 'inflight') {
 		return;
 	}
