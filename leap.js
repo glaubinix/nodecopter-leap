@@ -1,4 +1,5 @@
-var Leap = require('leapjs');
+var Leap = require('leapjs'),
+	_ = require('underscore');
 
 var controller = new Leap.Controller({ inNode: true });
 
@@ -26,6 +27,35 @@ controller.on("frame", function(frame) {
 	}
 
 	if (frame.hands.length == 1) {
+		if (frame.pointables.length === 0) {
+			eventemitter.emit('land');
+		}
+
+		if (frame.pointables.length > 4) {
+			// lets try to detect the big finger
+			var x_direction = 0;
+			_.each(frame.pointables, function (finger) {
+				x_direction += finger.direction[0];
+			});
+
+			x_direction = x_direction / 5;
+			var away = 0;
+			var the_finger;
+			_.each(frame.pointables, function (finger) {
+				if (away < Math.abs(finger.direction[0] - x_direction)) {
+					the_finger = finger;
+				}
+			});
+
+			if (the_finger.tipVelocity[1] < -500 || the_finger.tipVelocity[1] > 900) {
+				if (drone_state == 'inflight') {
+					drone_state = 'trick';
+					eventemitter.emit('flip');
+					return;
+				}
+			}
+		}
+
 		var up_down_speed = frame.hands[0].palmVelocity[1];
 		if (up_down_speed > 20) {
 			eventemitter.emit('up', up_down_speed);
