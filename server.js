@@ -20,10 +20,8 @@ drone.start();
 
 process.on('SIGINT', function() {
     console.log('bye bye');
-    drone.land(function(){
-        process.exit();
-    });
+    ee.emit('land')
     setTimeout(function(){
         process.exit();
-    }, 2)
+    }, 2000);
 });
