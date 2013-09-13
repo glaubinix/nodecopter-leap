@@ -34,19 +34,17 @@ controller.on("frame", function(frame) {
 			eventemitter.emit('right', -1 * right_left_speed);
 		}
 
+		var forward_backward_speed = frame.hands[0].palmNormal[2];
+		if (forward_backward_speed > 0.15) {
+			eventemitter.emit('forward', forward_backward_speed);
+			console.log('forward', forward_backward_speed);
+		} else if (forward_backward_speed < -0.15) {
+			eventemitter.emit('backward', -1 * forward_backward_speed);
+			console.log('backward', forward_backward_speed);
+		}
+
 	}
 });
-
-var frameCount = 0;
-controller.on("frame", function(frame) {
-	frameCount++;
-});
-
-setInterval(function() {
-	var time = frameCount/2;
-	console.log("received " + frameCount + " frames @ " + time + "fps");
-	frameCount = 0;
-}, 2000);
 
 controller.on('ready', function() {
 	console.log("ready");
