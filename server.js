@@ -16,3 +16,8 @@ var ee = new EventEmitter2({
 var leap = new leapcontrol(ee);
 var drone = new Drone(ee, client);
 drone.start();
+
+process.on('exit', function() {
+    console.log('bye bye');
+    drone.land();
+});
