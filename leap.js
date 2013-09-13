@@ -16,7 +16,7 @@ var leap = function(emitter) {
 
 controller.on("frame", function(frame) {
 	if (!inflight) {
-		//return;
+		return;
 	}
 
 	if (frame.hands.length > 0) {
