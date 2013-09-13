@@ -1,9 +1,14 @@
 _ = require('underscore')
 
+between = (x, min, max) ->
+  x >= min && x <= max
+
+# between(x, 0.001, 0.009)
+
 class Drone
 
   state = 'landed'
-  drone_alt = 0 # 0 - 50000
+  drone_alt = 0 # 0 - 5000
 
   constructor: (@eventemitter, @client) ->
     @client.on 'navdata', (data) ->
@@ -16,6 +21,7 @@ class Drone
   start: ->
     @registerTakeoffAndLanding()
     @registerMoves()
+    @registerTricks()
 
   registerTakeoffAndLanding: ->
     @eventemitter.on 'takeoff', =>
@@ -28,33 +34,30 @@ class Drone
         @updateState 'landed'
 
   registerMoves: ->
-    ###
-    @eventemitter.on 'left', (speed) => @sendCommand 'left', speed
-    @eventemitter.on 'right', (speed) => @sendCommand 'right', speed
-    @eventemitter.on 'forward', (speed) => @sendCommand 'front', speed
-    @eventemitter.on 'backward', (speed) => @sendCommand 'back', speed
-    ###
-
     @eventemitter.on 'left', (speed) => @client.left speed
     @eventemitter.on 'right', (speed) => @client.right speed
     @eventemitter.on 'forward', (speed) => @client.front speed
     @eventemitter.on 'backward', (speed) => @client.back speed
 
     @eventemitter.on 'altitude', (alt) => #0 - 400
-      #drone_perc =
-      #console.log 'send.alt', alt
+      drone_perc = Math.round ((100/5000) * drone_alt)
+      hand_perc = Math.round ((100/400) * alt)
+      @altitudeMove(drone_perc, hand_perc)
 
-  sendCommand: (cmd, arg) ->
-    console.log 'this should never happen'
-    return unless state is 'inflight'
-    console.log cmd, arg
-    @client[cmd](arg)
+  registerTricks: ->
+    @eventemitter.on 'flip', => @client.animate 'flipAhead', 1500
 
   updateState: (new_state) =>
     state = new_state
     @eventemitter.emit 'state', state
 
-  calculate_drone_speed: (drone_perc_alt, hand_perc_alt) =>
-
+  altitudeMove: (drone_perc_alt, hand_perc_alt) =>
+    if between(drone_perc_alt, hand_perc_alt -5, hand_perc_alt + 5)
+      client.stop();
+      return
+    if drone_perc_alt > hand_perc_alt
+      @client.up 0.5
+    if drone_perc_alt < hand_perc_alt
+      @client.down 0.5
 
 module.exports = Drone
