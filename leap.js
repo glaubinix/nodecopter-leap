@@ -14,8 +14,10 @@ var leap = function(emitter) {
 };
 
 controller.on("frame", function(frame) {
-	if (drone_state === 'landed' && frame.hands.length == 1) {
-		eventemitter.emit('takeoff');
+	if (frame % 2 == 0) return;
+
+	if (drone_state === 'landed' && frame.hands.length == 2) {
+		//eventemitter.emit('takeoff');
 		console.log("hand in -> takeoff");
 	}
 

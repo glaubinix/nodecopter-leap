@@ -10,8 +10,7 @@ var Drone = require('./Drone.js');
 
 var ee = new EventEmitter2({
 	wildcard: true,
-	delimiter: '::',
-	maxListeners: 20
+	delimiter: '::'
 });
 
 var leap = new leapcontrol(ee);
