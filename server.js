@@ -2,9 +2,14 @@
  * Created by ole on 9/13/13.
  */
 
-var ee = require('eventemitter2');
+var EventEmitter2 = require('eventemitter2').EventEmitter2;
 var leapcontrol = require('./leap.js');
-var drone = require('./drone.js');
+//var drone = require('./drone.js');
 
-var leap = new Leap(ee);
-var drone = new Drone(ee);
+var ee = new EventEmitter2({
+	wildcard: true,
+	delimiter: '::'
+});
+
+var leap = new leapcontrol(ee);
+//var drone = new Drone(ee);
