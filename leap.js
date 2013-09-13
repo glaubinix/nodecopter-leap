@@ -64,10 +64,8 @@ controller.on('disconnect', function() {
 	eventemitter.emit('land');
 });
 controller.on('focus', function() {
-	if (drone_ready) {
-		console.log("focus -> takeoff");
-		eventemitter.emit('takeoff');
-	}
+    console.log("focus -> takeoff");
+    eventemitter.emit('takeoff');
 });
 controller.on('blur', function() {
 	console.log("blur");
