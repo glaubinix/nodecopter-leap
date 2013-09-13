@@ -3,20 +3,18 @@ var Leap = require('leapjs');
 var controller = new Leap.Controller({ inNode: true });
 
 var eventemitter;
-var inflight = false;
-var drone_ready = true;
+var drone_state = 'landed';
 
 var leap = function(emitter) {
 	eventemitter = emitter;
 
-	eventemitter.on('inflight', function() {
-		inflight = true;
-		drone_ready = false;
+	eventemitter.on('state', function(state) {
+		drone_state = state;
 	});
 };
 
 controller.on("frame", function(frame) {
-	if (!inflight) {
+	if (!drone_state !== 'inflight') {
 		return;
 	}
 
@@ -59,7 +57,6 @@ controller.on('connect', function() {
 controller.on('disconnect', function() {
 	console.log("disconnect -> land");
 	eventemitter.emit('land');
-	inflight = false;
 });
 controller.on('focus', function() {
 	if (drone_ready) {
@@ -76,7 +73,6 @@ controller.on('deviceConnected', function() {
 });
 controller.on('deviceDisconnected', function() {
 	console.log("deviceDisconnected -> land");
-	inflight = false;
 	eventemitter.emit('land');
 });
 
